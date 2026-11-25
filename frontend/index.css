@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 48%, #e0f2fe 100%);
+    min-height: 100vh;
+    color: #0f172a;
+  }
+}
