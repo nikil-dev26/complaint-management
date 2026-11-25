@@ -4,7 +4,19 @@ import API from '../services/api.js';
 import socket from '../services/socket.js';
 import Navbar from '../components/Navbar.jsx';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+const rawBackendUrl =
+  import.meta.env.VITE_SOCKET_URL ||
+  import.meta.env.VITE_API_URL ||
+  'http://localhost:5000';
+
+const BACKEND_BASE_URL = rawBackendUrl.replace(/\/+$/, '').replace(/\/api$/, '');
+
+const resolveImageUrl = (imagePath) => {
+  if (!imagePath) return '';
+  if (/^https?:\/\//i.test(imagePath)) return imagePath;
+  const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+  return `${BACKEND_BASE_URL}${cleanPath}`;
+};
 
 const CATEGORIES = [
   'All',
@@ -242,7 +254,7 @@ const AdminDashboard = () => {
 
                   {item.image && (
                     <img
-                      src={`${SOCKET_URL}${item.image}`}
+                      src={resolveImageUrl(item.image)}
                       alt={item.title}
                       className="mt-2 h-28 w-auto rounded-xl border border-slate-200 object-cover"
                     />

@@ -2,6 +2,11 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
 export const protect = async (req, res, next) => {
+  if (!process.env.JWT_SECRET) {
+    console.error('JWT_SECRET is missing in environment variables');
+    return res.status(500).json({ message: 'Server configuration error' });
+  }
+
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -18,7 +23,7 @@ export const protect = async (req, res, next) => {
     }
 
     req.user = user;
-    next();
+    return next();
   } catch (error) {
     return res.status(401).json({ message: 'Not authorized, invalid token' });
   }

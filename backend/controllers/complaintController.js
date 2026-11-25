@@ -113,7 +113,11 @@ export const deleteComplaint = async (req, res) => {
     if (complaint.image) {
       const filePath = path.resolve(complaint.image.replace(/^\//, ''));
       if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
+        try {
+          await fs.promises.unlink(filePath);
+        } catch (fileErr) {
+          console.error('Failed to remove image file:', fileErr.message);
+        }
       }
     }
 

@@ -1,8 +1,16 @@
 import { useNavigate } from 'react-router-dom';
 
+const parseStoredUser = () => {
+  try {
+    return JSON.parse(localStorage.getItem('user') || 'null');
+  } catch {
+    return null;
+  }
+};
+
 const Navbar = ({ notificationCount = 0, onClearNotifications }) => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  const user = parseStoredUser();
 
   const handleLogout = () => {
     localStorage.removeItem('token');

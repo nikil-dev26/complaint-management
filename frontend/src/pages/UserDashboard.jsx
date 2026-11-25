@@ -4,7 +4,19 @@ import API from '../services/api.js';
 import socket from '../services/socket.js';
 import Navbar from '../components/Navbar.jsx';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+const rawBackendUrl =
+  import.meta.env.VITE_SOCKET_URL ||
+  import.meta.env.VITE_API_URL ||
+  'http://localhost:5000';
+
+const BACKEND_BASE_URL = rawBackendUrl.replace(/\/+$/, '').replace(/\/api$/, '');
+
+const resolveImageUrl = (imagePath) => {
+  if (!imagePath) return '';
+  if (/^https?:\/\//i.test(imagePath)) return imagePath;
+  const cleanPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+  return `${BACKEND_BASE_URL}${cleanPath}`;
+};
 
 const CATEGORIES = [
   'Hostel',
@@ -29,6 +41,7 @@ const getStatusBadge = (status) => {
 const UserDashboard = () => {
   const navigate = useNavigate();
   const currentUser = JSON.parse(localStorage.getItem('user') || 'null');
+  const currentUserId = currentUser?.id || currentUser?._id;
 
   const [complaints, setComplaints] = useState([]);
   const [title, setTitle] = useState('');
@@ -66,7 +79,7 @@ const UserDashboard = () => {
           ? updatedComplaint.userId?._id
           : updatedComplaint.userId;
 
-      if (currentUser && ownerId === currentUser.id) {
+      if (currentUserId && ownerId === currentUserId) {
         setComplaints((prev) =>
           prev.map((item) =>
             item._id === updatedComplaint._id ? updatedComplaint : item
@@ -90,7 +103,7 @@ const UserDashboard = () => {
       socket.off('complaintStatusUpdated', handleStatusUpdate);
       socket.off('complaintDeleted', handleComplaintDeleted);
     };
-  }, [currentUser]);
+  }, [currentUserId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -299,7 +312,7 @@ const UserDashboard = () => {
 
                 {item.image && (
                   <img
-                    src={`${SOCKET_URL}${item.image}`}
+                    src={resolveImageUrl(item.image)}
                     alt={item.title}
                     className="mt-3 h-36 w-auto rounded-xl border border-slate-200 object-cover"
                   />
