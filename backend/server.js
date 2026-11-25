@@ -21,15 +21,18 @@ const app = express();
 const server = http.createServer(app);
 
 // Socket.IO Setup
+const allowedOrigin = process.env.CLIENT_URL || 'http://localhost:5173';
+
 const io = new Server(server, {
-    cors: {
-        origin: 'http://localhost:5173',
-        methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    }
+  cors: {
+    origin: allowedOrigin,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  },
 });
 
+app.use(cors({ origin: allowedOrigin }));
+
 // Middleware
-app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.resolve('uploads')));
 
